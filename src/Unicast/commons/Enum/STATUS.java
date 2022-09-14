@@ -2,12 +2,12 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package Unicast.Client;
+package Unicast.commons.Enum;
 
 /**
  *
  * @author Administrator
  */
-public class ServerHandler {
-    
+public enum STATUS {
+    OK, BAD_REQUEST, BAD_RESPONCE;
 }
