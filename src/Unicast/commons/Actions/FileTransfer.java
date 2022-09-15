@@ -13,11 +13,13 @@ import Unicast.commons.Enum.ACTION;
 public class FileTransfer extends SimplePackage{
     private final byte[] data;
     private final String filePath;
+    private final long lenght;
 
-    public FileTransfer(String filePath, byte[] data) {
+    public FileTransfer(String filePath, byte[] data, long length) {
         super(ACTION.FILE_TRANSFER);
         this.filePath = filePath;
         this.data = data;
+        this.lenght = length;
     }
     
     public String getFilePath() {
@@ -26,6 +28,10 @@ public class FileTransfer extends SimplePackage{
 
     public byte[] getData() {
         return data;
+    }
+
+    public long getLength() {
+        return lenght;
     }
     
 }
