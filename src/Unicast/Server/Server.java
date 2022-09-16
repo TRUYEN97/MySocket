@@ -8,7 +8,6 @@ import Unicast.commons.Interface.IHandlerManager;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
-import Unicast.commons.Interface.IObjectReceiver;
 
 /**
  *

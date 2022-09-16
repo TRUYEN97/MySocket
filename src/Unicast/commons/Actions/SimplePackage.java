@@ -11,10 +11,10 @@ import java.io.Serializable;
  *
  * @author Administrator
  */
-public class SimplePackage implements Serializable{
+public class simplePackage implements Serializable{
     private final ACTION action;
 
-    public SimplePackage(ACTION action) {
+    public simplePackage(ACTION action) {
         this.action = action;
     }
 

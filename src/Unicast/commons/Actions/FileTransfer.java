@@ -10,7 +10,7 @@ import Unicast.commons.Enum.ACTION;
  *
  * @author Administrator
  */
-public class FileTransfer extends SimplePackage{
+public class FileTransfer extends simplePackage{
     private final byte[] data;
     private final String filePath;
     private final long lenght;
