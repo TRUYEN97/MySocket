@@ -14,15 +14,15 @@ import java.net.Socket;
  * @author Administrator
  */
 public class Server extends Thread {
-
+    
     private final ServerSocket serverSocket;
     private final IHandlerManager handlerManager;
-
-    public Server(int port, IHandlerManager handlerManager) throws IOException {
+    
+    public Server(int port, IHandlerManager handlerManager) throws Exception {
         this.serverSocket = new ServerSocket(port);
         this.handlerManager = handlerManager;
     }
-
+    
     @Override
     public void run() {
         try (this.serverSocket) {
@@ -40,7 +40,7 @@ public class Server extends Thread {
             this.handlerManager.shutdownNow();
         }
     }
-
+    
     private ClientHandler createHanhdler(Socket socket) {
         try {
             return new ClientHandler<>(socket, handlerManager);
@@ -49,9 +49,9 @@ public class Server extends Thread {
             return null;
         }
     }
-
+    
     public IHandlerManager getIHandlerManager() {
         return handlerManager;
     }
-
+    
 }

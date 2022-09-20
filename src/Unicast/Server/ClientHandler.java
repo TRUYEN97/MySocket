@@ -23,12 +23,12 @@ public class ClientHandler<T> implements Runnable, ISend<T> {
 
     private final Socket socket;
     private final ObjectOutputStream outputStream;
-    private final ObjectInputStream inputStream;
+    protected final ObjectInputStream inputStream;
     private IObjectReceiver<T> objectAnalysis;
     private final IHandlerManager handlerManager;
     private boolean connect;
 
-    ClientHandler(Socket socket, IHandlerManager handlerManager) throws IOException {
+    public ClientHandler(Socket socket, IHandlerManager handlerManager) throws IOException {
         this.socket = socket;
         this.outputStream = new ObjectOutputStream(socket.getOutputStream());
         this.inputStream = new ObjectInputStream(socket.getInputStream());
@@ -60,23 +60,18 @@ public class ClientHandler<T> implements Runnable, ISend<T> {
     @Override
     public void run() {
         try {
-            this.objectAnalysis.setHandler(this);
             while (isConnect()) {
                 this.objectAnalysis.receiver((T) inputStream.readObject());
             }
         } catch (IOException | ClassNotFoundException e) {
             this.handlerManager.disConnect(this);
         } finally {
-            closeStream();
+            disConnect();
         }
     }
 
     public void disConnect() {
         this.connect = false;
-    }
-
-    private void closeStream() {
-        disConnect();
         IOServeice.closeStream(socket);
         IOServeice.closeStream(outputStream);
         IOServeice.closeStream(inputStream);

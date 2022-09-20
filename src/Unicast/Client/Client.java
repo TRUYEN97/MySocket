@@ -55,7 +55,7 @@ public class Client<T> implements Runnable, IConnect, ISend<T> {
             this.outputStream.writeObject(object);
             return true;
         } catch (IOException ex) {
-            System.out.println(ex.getMessage());
+            System.out.println(ex.getLocalizedMessage());
             return false;
         }
     }
@@ -63,12 +63,11 @@ public class Client<T> implements Runnable, IConnect, ISend<T> {
     @Override
     public void run() {
         try {
-            this.objectAnalysis.setHandler(this);
             while (true) {
                 this.objectAnalysis.receiver((T) this.inputStream.readObject());
             }
         } catch (IOException | ClassNotFoundException ex) {
-            System.out.println(ex.getMessage());
+            System.out.println(ex.getLocalizedMessage());
         } finally {
             disConnect();
         }
@@ -81,13 +80,13 @@ public class Client<T> implements Runnable, IConnect, ISend<T> {
 
     @Override
     public boolean disConnect() {
+        connect = false;
         try {
             if (this.socket != null && this.socket.isConnected()) {
                 IOServeice.closeStream(socket);
                 IOServeice.closeStream(inputStream);
                 IOServeice.closeStream(outputStream);
             }
-            connect = false;
             return true;
         } catch (Exception e) {
             e.printStackTrace();

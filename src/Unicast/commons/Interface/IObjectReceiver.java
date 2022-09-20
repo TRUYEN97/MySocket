@@ -10,8 +10,6 @@ package Unicast.commons.Interface;
  * @param <T>
  */
 public interface IObjectReceiver<T> {
-
-    void setHandler(ISend<T> data);
-
+    
     void receiver(T object);
 }
