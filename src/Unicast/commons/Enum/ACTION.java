@@ -9,5 +9,5 @@ package Unicast.commons.Enum;
  * @author Administrator
  */
 public enum ACTION {
-    WHO_ARE_U, I_AM, DOWN_LOAD,UPDATE, NEW_VERSION, GOOD_BYE, FILE_TRANSFER, RUN;
+    WHO_ARE_U, I_AM, DOWN_LOAD,UPDATE, NEW_VERSION, GOOD_BYE, FILE_TRANSFER, RUN, MESSAGE;
 }
