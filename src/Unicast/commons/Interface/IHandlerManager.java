@@ -18,19 +18,9 @@ public interface IHandlerManager<T> {
     
     void disConnectAll();
     
-    boolean disConnect(long ID);
-    
-    boolean isShutdown();
+    void disConnect(String ID);
     
     void shutdown();
-    
-    List<Runnable> shutdownNow();
-    
-    int getMaxClint();
-    
-    int getWaitLine();
-    
-    int getAmountOfClients();
 
     void disConnect(ClientHandler<T> handlerName);
 }

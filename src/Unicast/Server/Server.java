@@ -36,8 +36,6 @@ public class Server extends Thread {
             }
         } catch (IOException ex) {
             ex.printStackTrace();
-        } finally {
-            this.handlerManager.shutdownNow();
         }
     }
     
