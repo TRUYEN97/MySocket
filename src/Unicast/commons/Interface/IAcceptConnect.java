@@ -4,13 +4,13 @@
  */
 package Unicast.commons.Interface;
 
+import Unicast.commons.Interface.IObjectServerReceiver;
+
 /**
  *
  * @author Administrator
- * @param <T>
  */
-public interface ISend<T> {
+interface IAcceptConnect<T> extends IObjectServerReceiver<T>{
     
-    boolean send(T object);
-    
+    String acceptable(T packageData);
 }

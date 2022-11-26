@@ -7,10 +7,9 @@ package Unicast.commons.Interface;
 /**
  *
  * @author Administrator
- * @param <T>
+ * @param <K>
+ * @param <D>
  */
-public interface ISend<T> {
-    
-    boolean send(T object);
+public interface IOnlineNumble<K, D> extends IAddOnlineNumble<K, D>, IListNumble<K, D>{
     
 }

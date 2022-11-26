@@ -12,13 +12,15 @@ import java.net.Socket;
 /**
  *
  * @author Administrator
+ * @param <K>
+ * @param <D>
  */
-public class Server extends Thread {
+public class Server<K, D> extends Thread {
     
     private final ServerSocket serverSocket;
-    private final IHandlerManager handlerManager;
+    private final IHandlerManager<K, D> handlerManager;
     
-    public Server(int port, IHandlerManager handlerManager) throws Exception {
+    public Server(int port, IHandlerManager<K, D> handlerManager) throws Exception {
         this.serverSocket = new ServerSocket(port);
         this.handlerManager = handlerManager;
     }
@@ -26,7 +28,7 @@ public class Server extends Thread {
     @Override
     public void run() {
         try (this.serverSocket) {
-            ClientHandler handler;
+            ClientHandler<D> handler;
             while (true) {
                 handler = createHanhdler(this.serverSocket.accept());
                 if (handler == null) {
@@ -39,7 +41,7 @@ public class Server extends Thread {
         }
     }
     
-    private ClientHandler createHanhdler(Socket socket) {
+    private ClientHandler<D> createHanhdler(Socket socket) {
         try {
             return new ClientHandler<>(socket, handlerManager);
         } catch (IOException e) {

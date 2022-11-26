@@ -15,30 +15,21 @@ import java.net.Socket;
  */
 public class IOServeice {
 
-    public static final void closeStream(Socket socket) {
-        try {
-            if (socket != null) {
-                socket.close();
-            }
-        } catch (IOException ex) {
-        }
-    }
-    
-    public static final void closeStream(InputStream inputStream) {
-        try {
-            if (inputStream != null) {
-                inputStream.close();
-            }
-        } catch (IOException ex) {
+    public static final void closeStream(Socket socket) throws IOException {
+        if (socket != null) {
+            socket.close();
         }
     }
 
-    public static final void closeStream(OutputStream outputStream) {
-        try {
-            if (outputStream != null) {
-                outputStream.close();
-            }
-        } catch (IOException ex) {
+    public static final void closeStream(InputStream inputStream) throws IOException {
+        if (inputStream != null) {
+            inputStream.close();
+        }
+    }
+
+    public static final void closeStream(OutputStream outputStream) throws IOException {
+        if (outputStream != null) {
+            outputStream.close();
         }
     }
 }

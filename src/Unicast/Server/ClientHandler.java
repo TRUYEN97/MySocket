@@ -5,6 +5,8 @@
 package Unicast.Server;
 
 import CommonsClass.IOServeice;
+import Unicast.commons.AbstractClass.AbsSender;
+import Unicast.commons.Interface.IDisConnect;
 import Unicast.commons.Interface.IHandlerManager;
 import Unicast.commons.Interface.ISend;
 import java.io.IOException;
@@ -12,19 +14,21 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.InetAddress;
 import java.net.Socket;
-import Unicast.commons.Interface.IObjectReceiver;
+import Unicast.commons.Interface.IIsConnect;
+import Unicast.commons.Interface.IObjectServerReceiver;
 
 /**
  *
  * @author Administrator
- * @param <T>
+ * @param <D>
  */
-public class ClientHandler<T> implements Runnable, ISend<T> {
+public class ClientHandler<D> implements Runnable, IIsConnect, IDisConnect, ISend<D> {
 
     private final Socket socket;
     private final ObjectOutputStream outputStream;
     protected final ObjectInputStream inputStream;
-    private IObjectReceiver<T> objectAnalysis;
+    protected AbsSender<D> iSend;
+    private IObjectServerReceiver objectAnalysis;
     private final IHandlerManager handlerManager;
     private boolean connect;
 
@@ -49,45 +53,58 @@ public class ClientHandler<T> implements Runnable, ISend<T> {
         return this.socket.getPort();
     }
 
+    @Override
     public boolean isConnect() {
         return this.socket != null && this.socket.isConnected() && connect;
     }
 
-    public void setObjectAnalysis(IObjectReceiver<T> objectAnalysis) {
+    public void setReceiver(IObjectServerReceiver objectAnalysis) {
         this.objectAnalysis = objectAnalysis;
+    }
+
+    public AbsSender<D> getSender() {
+        return iSend;
+    }
+
+    public void setSender(AbsSender<D> iSend) {
+        if (iSend == null) {
+            return;
+        }
+        iSend.setConnect(this);
+        iSend.setDisConnect(this);
+        iSend.setOutputStream(outputStream);
+        this.iSend = iSend;
     }
 
     @Override
     public void run() {
         try {
             while (isConnect()) {
-                this.objectAnalysis.receiver((T) inputStream.readObject());
+                this.objectAnalysis.receiver(this, (D) inputStream.readObject());
             }
         } catch (IOException | ClassNotFoundException e) {
-            this.handlerManager.disConnect(this);
+            e.printStackTrace();
         } finally {
-            disConnect();
+            this.handlerManager.disConnect(this);
         }
-    }
-
-    public void disConnect() {
-        this.connect = false;
-        IOServeice.closeStream(socket);
-        IOServeice.closeStream(outputStream);
-        IOServeice.closeStream(inputStream);
     }
 
     @Override
-    public boolean send(T object) {
+    public boolean disConnect() {
         try {
-            if (!isConnect()) {
-                return false;
-            }
-            this.outputStream.writeObject(object);
+            this.connect = false;
+            IOServeice.closeStream(socket);
+            IOServeice.closeStream(outputStream);
+            IOServeice.closeStream(inputStream);
             return true;
-        } catch (IOException ex) {
-            System.out.println(ex.getMessage());
+        } catch (IOException e) {
+            e.printStackTrace();
             return false;
         }
+    }
+
+    @Override
+    public boolean send(D object) {
+        return this.iSend.send(object);
     }
 }

@@ -8,11 +8,8 @@ package Unicast.commons.Interface;
  *
  * @author Administrator
  */
-public interface IConnect {
+public interface IConnect extends IIsConnect, IDisConnect{
 
     boolean connect(String host, int port);
 
-    boolean disConnect();
-
-    boolean isConnect();
 }

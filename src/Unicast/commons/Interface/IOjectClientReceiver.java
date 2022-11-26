@@ -4,13 +4,13 @@
  */
 package Unicast.commons.Interface;
 
+
 /**
  *
  * @author Administrator
  * @param <T>
  */
-public interface ISend<T> {
+public interface IOjectClientReceiver<T> {
     
-    boolean send(T object);
-    
+    void receiver(T object);
 }

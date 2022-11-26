@@ -11,7 +11,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
-import Unicast.commons.Interface.IObjectReceiver;
+import Unicast.commons.Interface.IOjectClientReceiver;
 
 /**
  *
@@ -24,10 +24,10 @@ public class Client<T> implements Runnable, IConnect, ISend<T> {
     private ObjectOutputStream outputStream;
     private ObjectInputStream inputStream;
     private boolean connect;
-    private final IObjectReceiver<T> objectAnalysis;
+    private final IOjectClientReceiver<T> clientReceiver;
 
-    public Client(IObjectReceiver<T> objectAnalysis) {
-        this.objectAnalysis = objectAnalysis;
+    public Client(IOjectClientReceiver<T> objectAnalysis) {
+        this.clientReceiver = objectAnalysis;
         this.connect = false;
     }
 
@@ -55,7 +55,7 @@ public class Client<T> implements Runnable, IConnect, ISend<T> {
             this.outputStream.writeObject(object);
             return true;
         } catch (IOException ex) {
-            System.out.println(ex.getLocalizedMessage());
+            ex.printStackTrace();
             return false;
         }
     }
@@ -64,10 +64,10 @@ public class Client<T> implements Runnable, IConnect, ISend<T> {
     public void run() {
         try {
             while (true) {
-                this.objectAnalysis.receiver((T) this.inputStream.readObject());
+                this.clientReceiver.receiver( (T) this.inputStream.readObject() );
             }
         } catch (IOException | ClassNotFoundException ex) {
-            System.out.println(ex.getLocalizedMessage());
+            ex.printStackTrace();
         } finally {
             disConnect();
         }

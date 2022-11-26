@@ -12,11 +12,18 @@ import Unicast.Server.ClientHandler;
  * @param <K>
  * @param <D>
  */
-public interface IHandlerManager<K, D> extends IListNumble<K, D>{
+public interface IListNumble<K, D> {
     
-    IListNumble<K, D> getOnlineNumble();
     
-    void add(ClientHandler<D> handler);
+    void disConnectAll();
     
-    void shutdown();
+    void disConnect(K id);
+    
+    void disConnect(ClientHandler<D> handlerName);
+    
+    boolean hasOnline(K id);
+    
+    ClientHandler<D> getClientHandler(K id);
+    
+    K getID(ClientHandler<D> handler);
 }

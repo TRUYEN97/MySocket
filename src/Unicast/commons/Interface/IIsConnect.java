@@ -7,10 +7,8 @@ package Unicast.commons.Interface;
 /**
  *
  * @author Administrator
- * @param <T>
  */
-public interface ISend<T> {
-    
-    boolean send(T object);
-    
+public interface IIsConnect {
+
+    boolean isConnect();
 }

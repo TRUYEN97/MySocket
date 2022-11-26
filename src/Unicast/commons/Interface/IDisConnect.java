@@ -7,9 +7,8 @@ package Unicast.commons.Interface;
 /**
  *
  * @author Administrator
- * @param <T>
  */
-public interface IObjectReceiver<T> {
+public interface IDisConnect {
     
-    void receiver(T object);
+    boolean disConnect();
 }

@@ -4,13 +4,15 @@
  */
 package Unicast.commons.Interface;
 
+import Unicast.Server.ClientHandler;
+
 /**
  *
  * @author Administrator
- * @param <T>
+ * @param <K>
+ * @param <D>
  */
-public interface ISend<T> {
+public interface IAddOnlineNumble<K, D>{
     
-    boolean send(T object);
-    
+    void addNumble(K id, ClientHandler<D> handler);
 }

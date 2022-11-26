@@ -4,13 +4,14 @@
  */
 package Unicast.commons.Interface;
 
+import Unicast.Server.ClientHandler;
+
 /**
  *
  * @author Administrator
  * @param <T>
  */
-public interface ISend<T> {
+public interface IObjectServerReceiver<T> {
     
-    boolean send(T object);
-    
+    void receiver(ClientHandler<T> handler, T  data);
 }
