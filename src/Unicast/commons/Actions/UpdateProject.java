@@ -11,7 +11,7 @@ import Unicast.commons.Enum.ACTION;
  *
  * @author Administrator
  */
-public class UpdateProject extends simplePackage{
+public class UpdateProject extends SimplePackage{
     
     private final String project;
     

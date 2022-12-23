@@ -13,7 +13,7 @@ import java.util.List;
  *
  * @author Administrator
  */
-public class MapRowsParameter extends simplePackage {
+public class MapRowsParameter extends SimplePackage {
 
     private final List<HashMap<String, String>> rows;
 

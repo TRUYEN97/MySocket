@@ -12,7 +12,7 @@ import java.util.List;
  *
  * @author Administrator
  */
-public class TableListRowParameter extends simplePackage{
+public class TableListRowParameter extends SimplePackage{
 
     private final List<String> column;
     private final List<List<String>> rowData;

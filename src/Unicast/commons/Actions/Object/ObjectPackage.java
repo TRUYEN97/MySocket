@@ -4,7 +4,7 @@
  */
 package Unicast.commons.Actions.Object;
 
-import Unicast.commons.Actions.simplePackage;
+import Unicast.commons.Actions.SimplePackage;
 import Unicast.commons.Enum.ACTION;
 
 /**
@@ -12,7 +12,7 @@ import Unicast.commons.Enum.ACTION;
  * @author Administrator
  * @param <T>
  */
-public class ObjectPackage<T> extends simplePackage {
+public class ObjectPackage<T> extends SimplePackage {
 
     protected final T data;
 
