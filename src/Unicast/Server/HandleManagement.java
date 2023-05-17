@@ -28,6 +28,12 @@ public class HandleManagement {
         this.handlers.remove(name);
     }
     
+    public void setDebug(boolean debug){
+        for (ClientHandler handler : this.handlers.values()) {
+            handler.setDebug(debug);
+        }
+    }
+    
     public ClientHandler getClientHandler(String name){
         return this.handlers.get(name);
     }

@@ -47,6 +47,7 @@ public class Server extends Thread {
 
     public void setDebug(boolean debug) {
         this.debug = debug;
+        this.handlerManager.setDebug(debug);
     }
 
     public void setPoolLimit(int poolLimit) {
@@ -82,6 +83,7 @@ public class Server extends Thread {
                     handler.disconnect();
                     continue;
                 }
+                handler.setDebug(debug);
                 handler.setFilter(this.filter);
                 handler.setObjectAnalysis(this.receiver);
                 this.threadpool.execute(handler);
