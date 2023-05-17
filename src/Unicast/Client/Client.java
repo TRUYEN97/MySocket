@@ -4,58 +4,74 @@
  */
 package Unicast.Client;
 
-import CommonsClass.IOServeice;
-import Unicast.commons.Interface.IConnect;
-import Unicast.commons.Interface.ISend;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
+import Unicast.commons.Interface.IIsConnect;
 import java.net.Socket;
-import Unicast.commons.Interface.IOjectClientReceiver;
+import Unicast.commons.Interface.Idisconnect;
+import Unicast.commons.Keywords;
+import Unicast.commons.SocketLogger;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import Unicast.commons.Interface.IObjectClientReceiver;
 
 /**
  *
  * @author Administrator
- * @param <T>
  */
-public class Client<T> implements Runnable, IConnect, ISend<T> {
+public class Client implements Runnable, Idisconnect, IIsConnect {
 
+    private final String host;
+    private final int port;
+    private final IObjectClientReceiver clientReceiver;
+    private final SocketLogger logger;
     private Socket socket;
-    private ObjectOutputStream outputStream;
-    private ObjectInputStream inputStream;
+    private PrintWriter outputStream;
+    private BufferedReader inputStream;
     private boolean connect;
-    private final IOjectClientReceiver<T> clientReceiver;
+    private boolean debug;
 
-    public Client(IOjectClientReceiver<T> objectAnalysis) {
+    public Client(String host, int port, IObjectClientReceiver objectAnalysis) {
+        this.host = host;
+        this.port = port;
+        this.logger = new SocketLogger("log/socket/client");
         this.clientReceiver = objectAnalysis;
-        this.connect = false;
+        this.debug = false;
     }
 
-    @Override
-    public boolean connect(String host, int port) {
+    public void setDebug(boolean debug) {
+        this.debug = debug;
+    }
+
+    public boolean connect() {
         try {
-            disConnect();
             this.socket = new Socket(host, port);
-            this.outputStream = new ObjectOutputStream(socket.getOutputStream());
-            this.inputStream = new ObjectInputStream(socket.getInputStream());
-            connect = true;
+            this.outputStream = new PrintWriter(socket.getOutputStream(), true);
+            this.inputStream = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            this.logger.addlog(Keywords.CLIENT, "Connect to host: %s, port: %s", host, port);
+            this.connect = true;
             return true;
-        } catch (IOException ex) {
-            connect = false;
+        } catch (Exception ex) {
+            if (debug) {
+                ex.printStackTrace();
+                this.logger.addlog(Keywords.ERROR, ex.getLocalizedMessage());
+            }
             return false;
         }
     }
 
-    @Override
-    public boolean send(T object) {
+    public boolean send(String data) {
         try {
             if (!isConnect()) {
                 return false;
             }
-            this.outputStream.writeObject(object);
+            this.outputStream.println(data);
+            this.logger.addlog(SocketLogger.pointToPoint(Keywords.CLIENT, host), data);
             return true;
-        } catch (IOException ex) {
-            ex.printStackTrace();
+        } catch (Exception e) {
+            if (debug) {
+                e.printStackTrace();
+                this.logger.addlog(Keywords.ERROR, e.getLocalizedMessage());
+            }
             return false;
         }
     }
@@ -63,13 +79,21 @@ public class Client<T> implements Runnable, IConnect, ISend<T> {
     @Override
     public void run() {
         try {
-            while (true) {
-                this.clientReceiver.receiver( (T) this.inputStream.readObject() );
+            String data;
+            while ((data = this.inputStream.readLine()) != null) {
+                if (data.trim().isBlank()) {
+                    continue;
+                }
+                this.logger.addlog(SocketLogger.pointToPoint(host, Keywords.CLIENT), data);
+                this.clientReceiver.receiver(data);
             }
-        } catch (IOException | ClassNotFoundException ex) {
-            ex.printStackTrace();
+        } catch (Exception ex) {
+            if (debug) {
+                ex.printStackTrace();
+                this.logger.addlog("ERROR", ex.getLocalizedMessage());
+            }
         } finally {
-            disConnect();
+            disconnect();
         }
     }
 
@@ -79,17 +103,22 @@ public class Client<T> implements Runnable, IConnect, ISend<T> {
     }
 
     @Override
-    public boolean disConnect() {
-        connect = false;
+    public boolean disconnect() {
+        if (socket == null || inputStream == null || outputStream == null) {
+            return true;
+        }
         try {
-            if (this.socket != null && this.socket.isConnected()) {
-                IOServeice.closeStream(socket);
-                IOServeice.closeStream(inputStream);
-                IOServeice.closeStream(outputStream);
-            }
+            inputStream.close();
+            outputStream.close();
+            socket.close();
+            connect = false;
+            this.logger.addlog(host, "disconnected!");
             return true;
         } catch (Exception e) {
-            e.printStackTrace();
+            if (debug) {
+                e.printStackTrace();
+                this.logger.addlog("ERROR", e.getLocalizedMessage());
+            }
             return false;
         }
     }

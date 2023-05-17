@@ -8,7 +8,7 @@ package Unicast.commons.Interface;
  *
  * @author Administrator
  */
-public interface IDisConnect {
+public interface Idisconnect {
     
-    boolean disConnect();
+    boolean disconnect();
 }

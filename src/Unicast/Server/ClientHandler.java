@@ -4,40 +4,61 @@
  */
 package Unicast.Server;
 
-import CommonsClass.IOServeice;
-import Unicast.commons.AbstractClass.AbsSender;
-import Unicast.commons.Interface.IDisConnect;
-import Unicast.commons.Interface.IHandlerManager;
-import Unicast.commons.Interface.ISend;
+import Unicast.commons.Interface.IFilter;
+import Unicast.commons.Interface.IIsConnect;
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.net.InetAddress;
 import java.net.Socket;
-import Unicast.commons.Interface.IIsConnect;
 import Unicast.commons.Interface.IObjectServerReceiver;
+import Unicast.commons.Interface.Idisconnect;
+import Unicast.commons.Keywords;
+import Unicast.commons.SocketLogger;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
 
 /**
  *
  * @author Administrator
- * @param <D>
  */
-public class ClientHandler<D> implements Runnable, IIsConnect, IDisConnect, ISend<D> {
+public class ClientHandler implements Runnable, Idisconnect, IIsConnect {
 
     private final Socket socket;
-    private final ObjectOutputStream outputStream;
-    protected final ObjectInputStream inputStream;
-    protected AbsSender<D> iSend;
+    private final PrintWriter outputStream;
+    private final BufferedReader inputStream;
+    private final HandleManagement handlerManager;
+    private final SocketLogger logger;
     private IObjectServerReceiver objectAnalysis;
-    private final IHandlerManager handlerManager;
+    private IFilter filter;
     private boolean connect;
+    private boolean debug;
+    private static long number = 0;
+    private String name;
 
-    public ClientHandler(Socket socket, IHandlerManager handlerManager) throws IOException {
+    public ClientHandler(Socket socket, SocketLogger logger, HandleManagement handlerManager) throws IOException {
         this.socket = socket;
-        this.outputStream = new ObjectOutputStream(socket.getOutputStream());
-        this.inputStream = new ObjectInputStream(socket.getInputStream());
+        this.logger = logger;
+        this.outputStream = new PrintWriter(socket.getOutputStream(), true);
+        this.inputStream = new BufferedReader(new InputStreamReader(socket.getInputStream()));
         this.connect = true;
         this.handlerManager = handlerManager;
+        this.name = String.format("Client-%s", ClientHandler.number++);
+        this.logger.addlog(Keywords.SERVER, "%s connected! - ip: %s", name, this.socket.getLocalSocketAddress());
+    }
+
+    public void setDebug(boolean debug) {
+        this.debug = debug;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setObjectAnalysis(IObjectServerReceiver objectAnalysis) {
+        if (objectAnalysis == null) {
+            return;
+        }
+        this.objectAnalysis = objectAnalysis;
     }
 
     public String getHostAddress() {
@@ -58,53 +79,67 @@ public class ClientHandler<D> implements Runnable, IIsConnect, IDisConnect, ISen
         return this.socket != null && this.socket.isConnected() && connect;
     }
 
-    public void setReceiver(IObjectServerReceiver objectAnalysis) {
-        this.objectAnalysis = objectAnalysis;
-    }
-
-    public AbsSender<D> getSender() {
-        return iSend;
-    }
-
-    public void setSender(AbsSender<D> iSend) {
-        if (iSend == null) {
-            return;
-        }
-        iSend.setConnect(this);
-        iSend.setDisConnect(this);
-        iSend.setOutputStream(outputStream);
-        this.iSend = iSend;
+    public void setFilter(IFilter filter) {
+        this.filter = filter;
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public void run() {
         try {
-            while (isConnect()) {
-                this.objectAnalysis.receiver(this, (D) inputStream.readObject());
+            if (this.filter != null && (name = this.filter.filter(this)) == null) {
+                return;
             }
-        } catch (IOException | ClassNotFoundException e) {
-            e.printStackTrace();
+            this.handlerManager.add(name, this);
+            String data;
+            while ((data = this.inputStream.readLine()) != null) {
+                if (data.trim().isBlank()) {
+                    continue;
+                }
+                this.logger.addlog(SocketLogger.pointToPoint(name, Keywords.SERVER), data);
+                this.objectAnalysis.receiver(this, data);
+            }
+        } catch (IOException e) {
+            if (debug) {
+                e.printStackTrace();
+                this.logger.addlog("ERROR", e.getLocalizedMessage());
+            }
         } finally {
-            this.handlerManager.disConnect(this);
+            disconnect();
         }
     }
 
     @Override
-    public boolean disConnect() {
-        try {
+    public boolean disconnect() {
+        try (socket; outputStream; inputStream) {
+            this.handlerManager.disconnect(this);
             this.connect = false;
-            IOServeice.closeStream(socket);
-            IOServeice.closeStream(outputStream);
-            IOServeice.closeStream(inputStream);
+            this.logger.addlog(Keywords.SERVER, "%s disconnected! - ip: %s", this.name, socket.getLocalSocketAddress());
             return true;
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (Exception e) {
+            if (debug) {
+                e.printStackTrace();
+                this.logger.addlog("ERROR", e.getLocalizedMessage());
+            }
             return false;
         }
     }
 
-    @Override
-    public boolean send(D object) {
-        return this.iSend.send(object);
+    public boolean send(String data) {
+        try {
+            if (!isConnect()) {
+                return false;
+            }
+            this.outputStream.println(data);
+            this.logger.addlog(SocketLogger.pointToPoint(Keywords.SERVER, name), data);
+            return true;
+        } catch (Exception e) {
+            if (debug) {
+                e.printStackTrace();
+                this.logger.addlog("ERROR", e.getLocalizedMessage());
+            }
+            return false;
+        }
     }
+
 }

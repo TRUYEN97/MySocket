@@ -8,9 +8,8 @@ package Unicast.commons.Interface;
 /**
  *
  * @author Administrator
- * @param <T>
  */
-public interface IOjectClientReceiver<T> {
+public interface IObjectClientReceiver {
     
-    void receiver(T object);
+    void receiver(String object);
 }

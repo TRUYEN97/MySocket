@@ -9,9 +9,8 @@ import Unicast.Server.ClientHandler;
 /**
  *
  * @author Administrator
- * @param <T>
  */
-public interface IObjectServerReceiver<T> {
-    
-    void receiver(ClientHandler<T> handler, T  data);
+public interface IObjectServerReceiver {
+
+    void receiver(ClientHandler handler, String data);
 }
