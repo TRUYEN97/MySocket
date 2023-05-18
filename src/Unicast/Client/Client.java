@@ -80,7 +80,7 @@ public class Client implements Runnable, Idisconnect, IIsConnect {
     public void run() {
         try {
             String data;
-            while ((data = this.inputStream.readLine()) != null) {
+            while (isConnect() && (data = this.inputStream.readLine()) != null) {
                 if (data.trim().isBlank()) {
                     continue;
                 }
@@ -104,13 +104,22 @@ public class Client implements Runnable, Idisconnect, IIsConnect {
 
     @Override
     public boolean disconnect() {
-        if (socket == null || inputStream == null || outputStream == null) {
+        if(!isConnect()){
             return true;
         }
         try {
-            inputStream.close();
-            outputStream.close();
-            socket.close();
+            if (socket != null) {
+                socket.close();
+                socket = null;
+            }
+            if (inputStream != null) {
+                inputStream.close();
+                inputStream = null;
+            }
+            if (outputStream != null) {
+                outputStream.close();
+                outputStream = null;
+            }
             connect = false;
             this.logger.addlog(host, "disconnected!");
             return true;
