@@ -85,7 +85,7 @@ public class Client implements Runnable, Idisconnect, IIsConnect {
                     continue;
                 }
                 this.logger.addlog(SocketLogger.pointToPoint(host, Keywords.CLIENT), data);
-                this.clientReceiver.receiver(data);
+                this.clientReceiver.receiver(this, data);
             }
         } catch (Exception ex) {
             if (debug) {
